@@ -26,13 +26,14 @@
 Hệ thống phân quyền được cài đặt trực tiếp vào WordPress Core và quản lý qua Must-Use plugin độc lập:  
 `wp-content/mu-plugins/cms-roles-manager.php`.
 
-### 2.1. Danh sách 3 tài khoản người dùng
+### 2.1. Danh sách tài khoản người dùng
 
 | STT | Tên đăng nhập (Username) | Mật khẩu (Password) | Vai trò (Role) | Email | Khả năng truy cập thực tế |
 | :---: | :--- | :--- | :--- | :--- | :--- |
-| 1 | **cms_read** | `User@123456` | **CMS Read** (`cms_read`) | cms_read@example.com | Chỉ đọc nội dung, chỉ xem hồ sơ cá nhân, không can thiệp bài viết hay hệ thống. |
-| 2 | **cms_write** | `User@123456` | **CMS Write** (`cms_write`) | cms_write@example.com | Đọc và viết nội dung: Thêm, sửa, xuất bản, xóa bài viết và upload media hình ảnh/video. |
-| 3 | **cms_admin** | `User@123456` | **CMS Admin** (`cms_admin`) | cms_admin@example.com | Toàn quyền quản trị nội dung + **Cài plugin, kích hoạt plugin, cài theme, đổi theme**. |
+| 1 | **admin** | `123` | **Administrator** (`administrator`) | minhquan13041999@gmail.com | Tài khoản Quản trị viên tối cao của website, toàn quyền cấu hình, quản lý user, plugin, theme. |
+| 2 | **cms_admin** | `123` *(hoặc `User@123456`)* | **CMS Admin** (`cms_admin`) | cms_admin@example.com | Toàn quyền quản trị nội dung + **Cài plugin, kích hoạt plugin, cài theme, đổi theme** theo rubric. |
+| 3 | **cms_write** | `User@123456` | **CMS Write** (`cms_write`) | cms_write@example.com | Đọc và viết nội dung: Thêm, sửa, xuất bản, xóa bài viết và upload media hình ảnh/video. |
+| 4 | **cms_read** | `User@123456` | **CMS Read** (`cms_read`) | cms_read@example.com | Chỉ đọc nội dung, chỉ xem hồ sơ cá nhân, không can thiệp bài viết hay hệ thống. |
 
 ### 2.2. Ma trận Capabilities (Quyền hạn) chi tiết
 
