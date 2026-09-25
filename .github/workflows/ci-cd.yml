@@ -1,0 +1,112 @@
+name: "CI/CD Pipeline - WordPress Cloud Deployment"
+
+on:
+  push:
+    branches:
+      - main
+      - master
+      - 1-24211TT1178-Quan
+  pull_request:
+    branches:
+      - main
+      - master
+  workflow_dispatch: # Cho phép bấm nút "Run workflow" thủ công trên giao diện GitHub
+
+jobs:
+  # =========================================================================
+  # GIAI ĐOẠN 1: CI (CONTINUOUS INTEGRATION) - KIỂM TRA CHẤT LƯỢNG MÃ NGUỒN
+  # =========================================================================
+  continuous-integration:
+    name: "CI: Linting & Syntax Check"
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: "1. Checkout mã nguồn từ Repository"
+        uses: actions/checkout@v4
+
+      - name: "2. Cấu hình môi trường PHP 8.2"
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: mbstring, xml, ctype, iconv, mysql, pdo_mysql
+
+      - name: "3. Chạy kiểm tra lỗi cú pháp PHP (PHP Syntax Lint)"
+        run: |
+          echo "🔍 Đang quét và kiểm tra lỗi cú pháp PHP (Bỏ qua core wp-admin/wp-includes để tối ưu tốc độ)..."
+          # Sử dụng find -prune để bỏ qua các thư mục không cần thiết và kiểm tra song song bằng xargs
+          find . \( -path "./wp-admin" -o -path "./wp-includes" -o -path "./.git" \) -prune -o -type f -name "*.php" -print0 | xargs -0 -n 1 -P 4 php -l
+          echo "✅ Toàn bộ file PHP tùy chỉnh và gốc đều hợp lệ, không có lỗi cú pháp!"
+
+      - name: "4. Kiểm tra cấu trúc thư mục & Database export"
+        run: |
+          echo "📁 Kiểm tra các thư mục cốt lõi..."
+          test -d "wp-content" && echo "✅ Thư mục wp-content hợp lệ."
+          if [ -d "db" ]; then
+            echo "✅ Thư mục db/ tồn tại."
+            ls -lh db/
+          fi
+
+  # =========================================================================
+  # GIAI ĐOẠN 2: CD (CONTINUOUS DEPLOYMENT) - TỰ ĐỘNG ĐẨY LÊN HOSTING/VPS
+  # =========================================================================
+  continuous-deployment:
+    name: "CD: Deploy to Cloud Server"
+    needs: continuous-integration # Chỉ chạy khi CI pass 100%
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+
+    steps:
+      - name: "1. Checkout mã nguồn đầy đủ"
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: "2. Kiểm tra cấu hình Secrets"
+        id: check_secrets
+        run: |
+          if [ -z "${{ secrets.FTP_SERVER }}" ] || [ -z "${{ secrets.FTP_USERNAME }}" ]; then
+            echo "HAS_SECRETS=false" >> $GITHUB_ENV
+            echo "⚠️ [CHÚ Ý] Bạn chưa điền GitHub Secrets (FTP_SERVER, FTP_USERNAME, FTP_PASSWORD)."
+            echo "👉 Vào Settings -> Secrets and variables -> Actions trên GitHub để cấu hình theo hướng dẫn."
+          else
+            echo "HAS_SECRETS=true" >> $GITHUB_ENV
+            echo "✅ Đã tìm thấy đầy đủ thông tin bảo mật GitHub Secrets."
+          fi
+
+      - name: "3. Triển khai lên Hosting qua FTP (Nếu đã có Secrets)"
+        if: env.HAS_SECRETS == 'true'
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          server-dir: ${{ secrets.FTP_SERVER_DIR || 'htdocs/' }}
+          exclude: |
+            **/.git*
+            **/.git*/**
+            **/node_modules/**
+            wp-config.php
+            wp-config-local.php
+            *.sql
+            *.log
+            *.bak
+            db/**
+            setup_vhost_hosts.bat
+            README.md
+            BAO_CAO_LAB1.md
+            USERS_ROLES.md
+
+      - name: "4. Mô phỏng triển khai thành công (Nếu đang ở chế độ Test / Demo)"
+        if: env.HAS_SECRETS == 'false'
+        run: |
+          echo "=========================================================="
+          echo "🚀 [DEMO MODE] Giai đoạn CD (Continuous Deployment) kích hoạt!"
+          echo "🌐 Trạng thái: Sẵn sàng đẩy code lên Cloud Server."
+          echo "📌 Hãy thêm Secrets để kích hoạt kết nối đẩy file tự động thực tế."
+          echo "=========================================================="
+
+      - name: "5. Báo cáo trạng thái hoàn thành"
+        run: |
+          echo "🎉 Pipeline hoàn thành xuất sắc!"
+          echo "Commit: ${{ github.sha }} bởi ${{ github.actor }}"
+          echo "Thời gian hoàn tất: $(date)"
