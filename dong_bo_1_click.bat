@@ -83,8 +83,7 @@ if %MYSQL_CMD%=="" (
 :: [5/5] MỞ WEBSITE TRÊN TRÌNH DUYỆT
 echo.
 echo [5/5] 🌐 Đang khởi chạy website trên trình duyệt...
-start http://localhost/BuiNguyenMinhQuan_CMS.git/
-start http://localhost/BuiNguyenMinhQuan_CMS.git/cicd-status.php
+start http://localhost/BuiNguyenMinhQuan_CMS.git/demo.php
 
 echo.
 color 0A
