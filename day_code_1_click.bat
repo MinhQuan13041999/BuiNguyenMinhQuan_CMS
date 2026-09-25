@@ -81,4 +81,7 @@ echo    https://github.com/MinhQuan13041999/BuiNguyenMinhQuan_CMS/actions
 echo.
 echo 📢 Đồng đội chỉ cần click file "dong_bo_1_click.bat" là nhận ngay bản mới!
 echo.
+echo 🌐 Đang tự động mở trang web demo để bạn kiểm tra...
+start http://localhost/BuiNguyenMinhQuan_CMS.git/demo.php
+echo.
 pause
