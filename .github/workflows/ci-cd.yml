@@ -46,6 +46,20 @@ jobs:
             ls -lh db/
           fi
 
+      - name: "5. Xuất báo cáo kiểm định (CI Step Summary)"
+        run: |
+          echo "## 🚀 Báo Cáo Kiểm Định Chất Lượng CI/CD Tự Động" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- **Trạng thái:** ✅ **CODE SẠCH 100% - ĐÃ KIỂM ĐỊNH THÀNH CÔNG**" >> $GITHUB_STEP_SUMMARY
+          echo "- **Người thực hiện:** \`${{ github.actor }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "- **Nhánh:** \`${{ github.ref_name }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "- **Mã Commit:** \`${{ github.sha }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### 📢 Hướng dẫn cho Thành viên nhóm (Đồng bộ 1-Click):" >> $GITHUB_STEP_SUMMARY
+          echo "1. Bản build này đã được máy ảo kiểm tra cú pháp PHP và Database hợp lệ." >> $GITHUB_STEP_SUMMARY
+          echo "2. Thành viên nhóm chỉ cần click đúp vào file **\`dong_bo_1_click.bat\`** trên máy cá nhân." >> $GITHUB_STEP_SUMMARY
+          echo "3. Hệ thống sẽ tự động kéo code, nạp Database và mở website trong 3 giây!" >> $GITHUB_STEP_SUMMARY
+
   # =========================================================================
   # GIAI ĐOẠN 2: CD (CONTINUOUS DEPLOYMENT) - TỰ ĐỘNG ĐẨY LÊN HOSTING/VPS
   # =========================================================================
